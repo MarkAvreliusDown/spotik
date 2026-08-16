@@ -10,10 +10,17 @@ interface SpotikAuthApi {
   onStatusChanged(cb: (status: AuthStatus) => void): () => void;
 }
 
+interface YandexCredentials {
+  apiKey: string;
+  folderId: string;
+}
+
 interface SpotikTranslationApi {
-  translateBatch(lines: string[], targetLang: string, provider: "ollama" | "deepl"): Promise<string[]>;
+  translateBatch(lines: string[], targetLang: string, provider: "ollama" | "deepl" | "yandex"): Promise<string[]>;
   setDeeplApiKey(key: string): Promise<void>;
   hasDeeplApiKey(): Promise<boolean>;
+  setYandexCredentials(creds: YandexCredentials): Promise<void>;
+  hasYandexCredentials(): Promise<boolean>;
 }
 
 interface SpotikWindowApi {

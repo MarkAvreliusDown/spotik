@@ -24,6 +24,15 @@ function createMainWindow(): BrowserWindow {
     },
   });
   win.loadFile(path.join(__dirname, "../renderer/index.html"));
+
+  // Menu.setApplicationMenu(null) убирает и стандартный accelerator Ctrl+Shift+I —
+  // перехватываем комбинацию напрямую, иначе DevTools в frameless-окне не открыть.
+  win.webContents.on("before-input-event", (_event, input) => {
+    if (input.control && input.shift && input.key.toLowerCase() === "i") {
+      win.webContents.toggleDevTools();
+    }
+  });
+
   return win;
 }
 

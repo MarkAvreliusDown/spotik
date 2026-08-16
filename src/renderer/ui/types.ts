@@ -1,5 +1,5 @@
 export type FontSize = "small" | "medium" | "large";
-export type TranslationProvider = "ollama" | "deepl";
+export type TranslationProvider = "ollama" | "deepl" | "yandex";
 
 export interface UiSettings {
   targetLang: string;

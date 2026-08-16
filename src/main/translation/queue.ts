@@ -2,14 +2,21 @@ import { cacheKey, getCached, setCached } from "../db/translationCache";
 import { translateViaOllama } from "./ollamaClient";
 import { translateViaDeepL } from "./deeplClient";
 import { getDeeplApiKey } from "./deeplKeyStore";
+import { translateViaYandex } from "./yandexClient";
+import { getYandexCredentials } from "./yandexKeyStore";
 
-export type TranslationProvider = "ollama" | "deepl";
+export type TranslationProvider = "ollama" | "deepl" | "yandex";
 
 async function translateViaProvider(texts: string[], targetLang: string, provider: TranslationProvider): Promise<string[]> {
   if (provider === "deepl") {
     const apiKey = await getDeeplApiKey();
     if (!apiKey) throw new Error("DeepL API key not configured");
     return translateViaDeepL(texts, targetLang, apiKey);
+  }
+  if (provider === "yandex") {
+    const creds = await getYandexCredentials();
+    if (!creds) throw new Error("Yandex Translate credentials not configured");
+    return translateViaYandex(texts, targetLang, creds.apiKey, creds.folderId);
   }
   return translateViaOllama(texts, targetLang);
 }

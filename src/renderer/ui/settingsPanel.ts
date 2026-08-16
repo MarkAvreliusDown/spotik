@@ -16,6 +16,7 @@ const FONT_SIZE_OPTIONS: Array<{ value: FontSize; label: string }> = [
 const PROVIDER_OPTIONS: Array<{ value: TranslationProvider; label: string }> = [
   { value: "ollama", label: "Ollama (локально)" },
   { value: "deepl", label: "DeepL (облако)" },
+  { value: "yandex", label: "Yandex Translate (облако)" },
 ];
 
 /** Панель настроек UI: язык перевода, показ/скрытие перевода, размер шрифта. Хранит своё состояние и уведомляет через onChange. */
@@ -124,17 +125,54 @@ export class SettingsPanel {
 
     deeplKeyRow.append(deeplKeyCaption, deeplKeyInput, deeplKeySaveBtn, deeplKeyStatus);
 
-    const updateDeeplKeyRowVisibility = (): void => {
-      deeplKeyRow.hidden = this.settings.translationProvider !== "deepl";
+    const yandexKeyRow = document.createElement("div");
+    yandexKeyRow.className = "settings-field settings-deepl-key";
+    const yandexKeyCaption = document.createElement("span");
+    yandexKeyCaption.textContent = "Yandex API-ключ";
+    const yandexKeyInput = document.createElement("input");
+    yandexKeyInput.type = "password";
+    yandexKeyInput.placeholder = "API-ключ сервисного аккаунта";
+    const yandexFolderInput = document.createElement("input");
+    yandexFolderInput.type = "text";
+    yandexFolderInput.placeholder = "Folder ID";
+    const yandexKeySaveBtn = document.createElement("button");
+    yandexKeySaveBtn.type = "button";
+    yandexKeySaveBtn.textContent = "Сохранить";
+    const yandexKeyStatus = document.createElement("span");
+    yandexKeyStatus.className = "settings-deepl-key-status";
+
+    const refreshYandexKeyStatus = (): void => {
+      void window.spotikTranslation.hasYandexCredentials().then((hasKey) => {
+        yandexKeyStatus.textContent = hasKey ? "Ключ сохранён" : "Ключ не задан";
+      });
     };
-    updateDeeplKeyRowVisibility();
+    refreshYandexKeyStatus();
+
+    yandexKeySaveBtn.addEventListener("click", () => {
+      const apiKey = yandexKeyInput.value.trim();
+      const folderId = yandexFolderInput.value.trim();
+      if (!apiKey || !folderId) return;
+      void window.spotikTranslation.setYandexCredentials({ apiKey, folderId }).then(() => {
+        yandexKeyInput.value = "";
+        yandexFolderInput.value = "";
+        refreshYandexKeyStatus();
+      });
+    });
+
+    yandexKeyRow.append(yandexKeyCaption, yandexKeyInput, yandexFolderInput, yandexKeySaveBtn, yandexKeyStatus);
+
+    const updateProviderRowsVisibility = (): void => {
+      deeplKeyRow.hidden = this.settings.translationProvider !== "deepl";
+      yandexKeyRow.hidden = this.settings.translationProvider !== "yandex";
+    };
+    updateProviderRowsVisibility();
 
     providerSelect.addEventListener("change", () => {
       this.settings = { ...this.settings, translationProvider: providerSelect.value as TranslationProvider };
-      updateDeeplKeyRowVisibility();
+      updateProviderRowsVisibility();
       this.onChange({ ...this.settings });
     });
 
-    container.append(langLabel, showRow, fontLabel, providerLabel, deeplKeyRow);
+    container.append(langLabel, showRow, fontLabel, providerLabel, deeplKeyRow, yandexKeyRow);
   }
 }

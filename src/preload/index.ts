@@ -18,11 +18,19 @@ const spotikAuth = {
 
 contextBridge.exposeInMainWorld("spotikAuth", spotikAuth);
 
+export interface YandexCredentials {
+  apiKey: string;
+  folderId: string;
+}
+
 const spotikTranslation = {
-  translateBatch: (lines: string[], targetLang: string, provider: "ollama" | "deepl"): Promise<string[]> =>
+  translateBatch: (lines: string[], targetLang: string, provider: "ollama" | "deepl" | "yandex"): Promise<string[]> =>
     ipcRenderer.invoke("translate:batch", lines, targetLang, provider),
   setDeeplApiKey: (key: string): Promise<void> => ipcRenderer.invoke("translation:setDeeplApiKey", key),
   hasDeeplApiKey: (): Promise<boolean> => ipcRenderer.invoke("translation:hasDeeplApiKey"),
+  setYandexCredentials: (creds: YandexCredentials): Promise<void> =>
+    ipcRenderer.invoke("translation:setYandexCredentials", creds),
+  hasYandexCredentials: (): Promise<boolean> => ipcRenderer.invoke("translation:hasYandexCredentials"),
 };
 
 contextBridge.exposeInMainWorld("spotikTranslation", spotikTranslation);

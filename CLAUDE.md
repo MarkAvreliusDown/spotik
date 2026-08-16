@@ -16,7 +16,7 @@
   и прямо нарушает ToS + технически хрупко (токен протухает). lrclib не даёт текст 100% треков,
   но легален и стабилен. Можно оставить эндпоинт Spotify как fallback второй очереди —
   на усмотрение, но по умолчанию не делаем.
-- **Перевод — два переключаемых провайдера**, выбор в UI (шестерёнка настроек →
+- **Перевод — три переключаемых провайдера**, выбор в UI (шестерёнка настроек →
   «Провайдер перевода»), сохраняется в `localStorage` (`UiSettings.translationProvider`,
   по умолчанию `"ollama"`):
   - **Ollama** (`src/main/translation/ollamaClient.ts`, модель по умолчанию gemma2:9b —
@@ -38,7 +38,18 @@
     в `.env` и не в `localStorage`, а через `keytar`/OS keychain
     (`src/main/translation/deeplKeyStore.ts`, тот же паттерн, что и у Spotify
     refresh-token в `src/main/auth/tokenStore.ts`) — в renderer сам ключ никогда не
-    передаётся, только факт "задан/не задан" (`translation:hasDeeplApiKey` IPC).
+    передаётся, только факт "задан/не задан" (`translation:hasDeeplApiKey` IPC). DeepL
+    возвращает `HTTP 451 Unavailable in your region` для части регионов (обнаружено на
+    практике для РФ) — код это не обрабатывает специально, ошибка просто всплывает как
+    есть; для таких случаев есть Yandex Translate ниже.
+  - **Yandex Translate** (`src/main/translation/yandexClient.ts`) — облачный API,
+    добавлен вторым альтернативным провайдером специально из-за геоблокировки DeepL:
+    один POST на весь батч к `translate.api.cloud.yandex.net/translate/v2/translate`.
+    В отличие от DeepL (один секрет), Yandex Cloud требует пару значений — API-ключ
+    сервисного аккаунта (с ролью `ai.translate.user`) и `folderId` каталога, оба вводятся
+    в UI и хранятся вместе одной JSON-строкой через `keytar`
+    (`src/main/translation/yandexKeyStore.ts::YandexCredentials`), тем же паттерном
+    хранения, что и у DeepL/Spotify-токена.
   - Диспетчеризация по выбранному провайдеру — `src/main/translation/queue.ts`.
     `translate:batch(lines, targetLang, provider)` — provider обязателен третьим
     аргументом (и в IPC, и в контракте `translation-agent` ниже). Смена провайдера в UI
@@ -99,12 +110,14 @@ Electron Main Process
   см. блок "Стек"), кэш в SQLite по хэшу текста+языка+провайдера.
 - **Файлы**: `src/main/translation/*`, `src/main/db/*`
 - **IPC**: `translate:batch(lines[], targetLang, provider) → translations[]`,
-  `translation:setDeeplApiKey(key)`, `translation:hasDeeplApiKey() → boolean`
+  `translation:setDeeplApiKey(key)`, `translation:hasDeeplApiKey() → boolean`,
+  `translation:setYandexCredentials({apiKey, folderId})`,
+  `translation:hasYandexCredentials() → boolean`
 
 ### 6. `ui-agent`
 - **Зона**: React/vanilla UI компонент построчного отображения (оригинал + перевод под строкой),
-  автоскролл к активной строке, настройки (язык перевода, провайдер перевода + DeepL-ключ,
-  шрифт, показать/скрыть перевод).
+  автоскролл к активной строке, настройки (язык перевода, провайдер перевода + учётные
+  данные DeepL/Yandex, шрифт, показать/скрыть перевод).
 - **Файлы**: `src/renderer/ui/*`
 - **Использует**: события от sync-agent и translation-agent, ничего не знает про сеть
 
@@ -119,11 +132,12 @@ Electron Main Process
 
 ## Решённые вопросы
 
-- **API перевода**: два переключаемых провайдера, Ollama (по умолчанию) и DeepL, см. блок
-  "Стек" выше. До этого решение менялось дважды (изначально — DeepL+LibreTranslate, затем
-  чистый LibreTranslate, затем чистый Ollama) — теперь оба варианта сосуществуют как выбор
-  пользователя в UI, а не взаимоисключающая замена: DeepL закрывает случай слабого/
-  отсутствующего GPU, для которого Ollama непригодна.
+- **API перевода**: три переключаемых провайдера, Ollama (по умолчанию), DeepL и Yandex
+  Translate, см. блок "Стек" выше. До этого решение менялось дважды (изначально —
+  DeepL+LibreTranslate, затем чистый LibreTranslate, затем чистый Ollama) — теперь все
+  варианты сосуществуют как выбор пользователя в UI, а не взаимоисключающая замена: DeepL/
+  Yandex закрывают случай слабого/отсутствующего GPU, для которого Ollama непригодна;
+  Yandex дополнительно закрывает регионы, где DeepL недоступен (HTTP 451, в т.ч. РФ).
 - **Целевой язык перевода**: выбираемый в UI (настройка, не константа).
 - **Offline-режим**: не нужен в первой версии как отдельная фича, но перевод через Ollama
   фактически и так работает офлайн (только lrclib.net и Spotify API требуют сеть). SQLite-кэш
