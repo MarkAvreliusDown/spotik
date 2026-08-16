@@ -16,6 +16,7 @@ function createMainWindow(): BrowserWindow {
     minHeight: 600,
     backgroundColor: "#0d0d0f",
     frame: false,
+    icon: path.join(__dirname, "../assets/icon.png"),
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.js"),
       nodeIntegration: false,

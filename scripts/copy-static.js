@@ -5,6 +5,7 @@ const pairs = [
   ["src/renderer/index.html", "dist/renderer/index.html"],
   ["src/renderer/ui/styles.css", "dist/renderer/ui/styles.css"],
   ["src/renderer/ui/tokens.css", "dist/renderer/ui/tokens.css"],
+  ["src/assets/icon.png", "dist/assets/icon.png"],
 ];
 
 for (const [src, dest] of pairs) {
