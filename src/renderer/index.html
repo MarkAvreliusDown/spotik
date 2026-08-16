@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spotik</title>
+    <link rel="stylesheet" href="./ui/tokens.css" />
+    <link rel="stylesheet" href="./ui/styles.css" />
+  </head>
+  <body>
+    <header id="titlebar" class="titlebar">
+      <div class="titlebar-drag">
+        <span class="titlebar-title">spotik</span>
+      </div>
+      <div class="titlebar-controls">
+        <button id="settings-toggle" class="icon-btn" type="button" aria-label="Настройки" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3.2" />
+            <path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.92 2.92l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V19.6a2.06 2.06 0 1 1-4.12 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.92-2.92l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H4.4a2.06 2.06 0 1 1 0-4.12h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2.06 2.06 0 1 1 2.92-2.92l.06.06a1.7 1.7 0 0 0 1.87.34H10.6a1.7 1.7 0 0 0 1.03-1.56V4.4a2.06 2.06 0 1 1 4.12 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.92 2.92l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.56 1.03h.09a2.06 2.06 0 1 1 0 4.12h-.09a1.7 1.7 0 0 0-1.56 1.03Z" />
+          </svg>
+        </button>
+        <span class="titlebar-sep"></span>
+        <button id="win-minimize" class="win-btn" type="button" aria-label="Свернуть">
+          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M0 5h10" stroke="currentColor" stroke-width="1" /></svg>
+        </button>
+        <button id="win-maximize" class="win-btn" type="button" aria-label="Развернуть">
+          <svg viewBox="0 0 10 10" width="10" height="10"><rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1" /></svg>
+        </button>
+        <button id="win-close" class="win-btn win-btn-close" type="button" aria-label="Закрыть">
+          <svg viewBox="0 0 10 10" width="10" height="10"><path d="M0 0l10 10M10 0L0 10" stroke="currentColor" stroke-width="1" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="settings-popover" class="popover" hidden></div>
+
+    <main id="app">
+      <section id="auth-gate" class="auth-gate">
+        <p id="auth-status" class="auth-status">Загрузка…</p>
+        <button id="login" class="auth-btn" type="button" hidden>Войти через Spotify</button>
+      </section>
+
+      <div id="lyrics-view" class="lyrics-view" hidden></div>
+    </main>
+
+    <footer id="player-bar" class="player-bar" hidden></footer>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

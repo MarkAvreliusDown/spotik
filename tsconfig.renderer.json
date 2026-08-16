@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "outDir": "dist/renderer",
+    "rootDir": "src/renderer",
+    "lib": ["ES2020", "DOM"],
+    "types": []
+  },
+  "include": ["src/renderer/**/*.ts"]
+}
