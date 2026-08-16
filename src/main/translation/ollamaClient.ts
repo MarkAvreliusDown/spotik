@@ -26,6 +26,9 @@ function buildPrompt(text: string, targetLang: string, strict: boolean): string 
     : "";
   return (
     `Translate the following song lyric line to ${languageName}. ` +
+    "Write it the way a native speaker would naturally say it — rephrase grammar, " +
+    "word order and idioms as needed instead of translating word-for-word. " +
+    "Keep it a single line matching the original's meaning and tone. " +
     "Output ONLY the translation, no quotes, no explanations, no transliteration." +
     strictSuffix +
     `\n\nText: ${text}`
