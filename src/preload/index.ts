@@ -19,8 +19,10 @@ const spotikAuth = {
 contextBridge.exposeInMainWorld("spotikAuth", spotikAuth);
 
 const spotikTranslation = {
-  translateBatch: (lines: string[], targetLang: string): Promise<string[]> =>
-    ipcRenderer.invoke("translate:batch", lines, targetLang),
+  translateBatch: (lines: string[], targetLang: string, provider: "ollama" | "deepl"): Promise<string[]> =>
+    ipcRenderer.invoke("translate:batch", lines, targetLang, provider),
+  setDeeplApiKey: (key: string): Promise<void> => ipcRenderer.invoke("translation:setDeeplApiKey", key),
+  hasDeeplApiKey: (): Promise<boolean> => ipcRenderer.invoke("translation:hasDeeplApiKey"),
 };
 
 contextBridge.exposeInMainWorld("spotikTranslation", spotikTranslation);

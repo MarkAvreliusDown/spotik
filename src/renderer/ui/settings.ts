@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS: UiSettings = {
   targetLang: "en",
   showTranslation: true,
   fontSize: "medium",
+  translationProvider: "ollama",
 };
 
 /** Список ограничен языками, которые типичный self-host LibreTranslate поддерживает из коробки. */

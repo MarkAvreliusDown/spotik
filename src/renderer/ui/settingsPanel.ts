@@ -1,4 +1,4 @@
-import type { FontSize, UiSettings } from "./types.js";
+import type { FontSize, TranslationProvider, UiSettings } from "./types.js";
 
 export interface SettingsPanelOptions {
   container: HTMLElement;
@@ -11,6 +11,11 @@ const FONT_SIZE_OPTIONS: Array<{ value: FontSize; label: string }> = [
   { value: "small", label: "Мелкий" },
   { value: "medium", label: "Средний" },
   { value: "large", label: "Крупный" },
+];
+
+const PROVIDER_OPTIONS: Array<{ value: TranslationProvider; label: string }> = [
+  { value: "ollama", label: "Ollama (локально)" },
+  { value: "deepl", label: "DeepL (облако)" },
 ];
 
 /** Панель настроек UI: язык перевода, показ/скрытие перевода, размер шрифта. Хранит своё состояние и уведомляет через onChange. */
@@ -74,6 +79,62 @@ export class SettingsPanel {
     });
     fontLabel.append(fontCaption, fontSelect);
 
-    container.append(langLabel, showRow, fontLabel);
+    const providerLabel = document.createElement("label");
+    providerLabel.className = "settings-field";
+    const providerCaption = document.createElement("span");
+    providerCaption.textContent = "Провайдер перевода";
+    const providerSelect = document.createElement("select");
+    for (const option of PROVIDER_OPTIONS) {
+      const opt = document.createElement("option");
+      opt.value = option.value;
+      opt.textContent = option.label;
+      opt.selected = option.value === this.settings.translationProvider;
+      providerSelect.appendChild(opt);
+    }
+    providerLabel.append(providerCaption, providerSelect);
+
+    const deeplKeyRow = document.createElement("div");
+    deeplKeyRow.className = "settings-field settings-deepl-key";
+    const deeplKeyCaption = document.createElement("span");
+    deeplKeyCaption.textContent = "DeepL API-ключ";
+    const deeplKeyInput = document.createElement("input");
+    deeplKeyInput.type = "password";
+    deeplKeyInput.placeholder = "Вставьте ключ";
+    const deeplKeySaveBtn = document.createElement("button");
+    deeplKeySaveBtn.type = "button";
+    deeplKeySaveBtn.textContent = "Сохранить";
+    const deeplKeyStatus = document.createElement("span");
+    deeplKeyStatus.className = "settings-deepl-key-status";
+
+    const refreshDeeplKeyStatus = (): void => {
+      void window.spotikTranslation.hasDeeplApiKey().then((hasKey) => {
+        deeplKeyStatus.textContent = hasKey ? "Ключ сохранён" : "Ключ не задан";
+      });
+    };
+    refreshDeeplKeyStatus();
+
+    deeplKeySaveBtn.addEventListener("click", () => {
+      const key = deeplKeyInput.value.trim();
+      if (!key) return;
+      void window.spotikTranslation.setDeeplApiKey(key).then(() => {
+        deeplKeyInput.value = "";
+        refreshDeeplKeyStatus();
+      });
+    });
+
+    deeplKeyRow.append(deeplKeyCaption, deeplKeyInput, deeplKeySaveBtn, deeplKeyStatus);
+
+    const updateDeeplKeyRowVisibility = (): void => {
+      deeplKeyRow.hidden = this.settings.translationProvider !== "deepl";
+    };
+    updateDeeplKeyRowVisibility();
+
+    providerSelect.addEventListener("change", () => {
+      this.settings = { ...this.settings, translationProvider: providerSelect.value as TranslationProvider };
+      updateDeeplKeyRowVisibility();
+      this.onChange({ ...this.settings });
+    });
+
+    container.append(langLabel, showRow, fontLabel, providerLabel, deeplKeyRow);
   }
 }

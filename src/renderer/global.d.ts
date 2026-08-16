@@ -11,7 +11,9 @@ interface SpotikAuthApi {
 }
 
 interface SpotikTranslationApi {
-  translateBatch(lines: string[], targetLang: string): Promise<string[]>;
+  translateBatch(lines: string[], targetLang: string, provider: "ollama" | "deepl"): Promise<string[]>;
+  setDeeplApiKey(key: string): Promise<void>;
+  hasDeeplApiKey(): Promise<boolean>;
 }
 
 interface SpotikWindowApi {

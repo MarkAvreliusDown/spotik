@@ -179,6 +179,42 @@ button {
   cursor: pointer;
 }
 
+.settings-deepl-key {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.settings-deepl-key input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  padding: var(--space-1) var(--space-2);
+}
+
+.settings-deepl-key button {
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+}
+
+.settings-deepl-key-status {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  flex-basis: 100%;
+}
+
 .popover-divider {
   height: 1px;
   background: var(--color-border);

@@ -101,11 +101,12 @@ function ensureTranslated(indexes: number[]): void {
   const lang = settings.targetLang;
   const texts = missing.map((i) => currentLines[i].text);
 
+  const provider = settings.translationProvider;
   window.spotikTranslation
-    .translateBatch(texts, lang)
+    .translateBatch(texts, lang, provider)
     .then((results) => {
-      // Пока перевод летал в main-процесс, могли сменить трек или язык — тогда результат уже не актуален.
-      if (lang !== settings.targetLang) return;
+      // Пока перевод летал в main-процесс, могли сменить трек, язык или провайдера — тогда результат уже не актуален.
+      if (lang !== settings.targetLang || provider !== settings.translationProvider) return;
       for (const i of missing) translationsInFlight.delete(i);
       results.forEach((text, j) => {
         const index = missing[j];
@@ -181,10 +182,11 @@ new SettingsPanel({
   languages: AVAILABLE_LANGUAGES,
   onChange: (next) => {
     const langChanged = next.targetLang !== settings.targetLang;
+    const providerChanged = next.translationProvider !== settings.translationProvider;
     settings = next;
     saveSettings(settings);
     lyricsView.applySettings(settings);
-    if (langChanged) {
+    if (langChanged || providerChanged) {
       resetTranslationState();
       const index = syncEngine.getActiveIndex();
       const upcoming = Array.from({ length: UPCOMING_TRANSLATE_COUNT }, (_, k) => index + 1 + k);
