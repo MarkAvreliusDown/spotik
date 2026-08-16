@@ -20,7 +20,7 @@
 1. [Node.js](https://nodejs.org/) 20+
 2. [Ollama](https://ollama.com), запущенный локально, с загруженной моделью:
    ```
-   ollama pull qwen2.5:7b
+   ollama pull gemma2:9b
    ```
 3. `SPOTIFY_CLIENT_ID` и `SPOTIFY_REDIRECT_URI` — см. ниже
 
