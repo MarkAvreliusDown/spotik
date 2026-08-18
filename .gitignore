@@ -5,3 +5,7 @@ release/
 *.log
 *.tsbuildinfo
 *.exe
+
+# Служебные файлы Claude Code — только для локальной работы, не для репозитория
+CLAUDE.md
+.claude/
